@@ -2,7 +2,9 @@ package com.example.back_end_java.controller;
 
 import com.example.back_end_java.model.Document;
 import com.example.back_end_java.service.DocumentService;
-import org.springframework.http.HttpStatus;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -11,6 +13,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/documents")
+@Tag(name = "Document API", description = "API для управління документами")
 public class DocumentController {
 
     private final DocumentService documentService;
@@ -20,43 +23,54 @@ public class DocumentController {
     }
 
     @PostMapping
-    public ResponseEntity<Document> createDocument(@RequestBody Document document) {
-        Document existingDocument = documentService.findByTitle(document.getTitle());
-        if (existingDocument != null) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(existingDocument);
-        }
-        Document createdDocument = documentService.createDocument(document);
-        return ResponseEntity.status(HttpStatus.CREATED).body(createdDocument); // Статус 201 (Created)
+    @Operation(summary = "Створити новий документ", description = "Додає новий документ в базу даних")
+    public ResponseEntity<Document> createDocument(
+            @RequestBody @Parameter(description = "Дані для створення нового документа") Document document) {
+        return ResponseEntity.ok(documentService.createDocument(document));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Document> updateDocument(@PathVariable Long id, @RequestBody Document updatedDocument) {
+    @Operation(summary = "Оновити документ", description = "Оновлює існуючий документ за його ID")
+    public ResponseEntity<Document> updateDocument(
+            @PathVariable @Parameter(description = "ID документа") Long id,
+            @RequestBody @Parameter(description = "Оновлені дані документа") Document updatedDocument) {
         return ResponseEntity.ok(documentService.updateDocument(id, updatedDocument));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteDocument(@PathVariable Long id) {
+    @Operation(summary = "Видалити документ", description = "Видаляє документ за його ID")
+    public ResponseEntity<Void> deleteDocument(
+            @PathVariable @Parameter(description = "ID документа") Long id) {
         documentService.deleteDocument(id);
         return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/user/{userLogin}")
-    public ResponseEntity<List<Document>> getDocumentsByUser(@PathVariable String userLogin) {
+    @Operation(summary = "Отримати документи користувача", description = "Отримує всі документи користувача за логіном")
+    public ResponseEntity<List<Document>> getDocumentsByUser(
+            @PathVariable @Parameter(description = "Логін користувача") String userLogin) {
         return ResponseEntity.ok(documentService.getDocumentsByUser(userLogin));
     }
 
     @GetMapping("/signed/user/{userLogin}")
-    public ResponseEntity<List<Document>> getSignedDocumentsByUser(@PathVariable String userLogin) {
+    @Operation(summary = "Отримати підписані документи користувача", description = "Отримує всі підписані документи користувача за логіном")
+    public ResponseEntity<List<Document>> getSignedDocumentsByUser(
+            @PathVariable @Parameter(description = "Логін користувача") String userLogin) {
         return ResponseEntity.ok(documentService.getSignedDocumentsByUser(userLogin));
     }
 
     @GetMapping("/unsigned/user/{userLogin}")
-    public ResponseEntity<List<Document>> getUnsignedDocumentsByUser(@PathVariable String userLogin) {
+    @Operation(summary = "Отримати непідписані документи користувача", description = "Отримує всі непідписані документи користувача за логіном")
+    public ResponseEntity<List<Document>> getUnsignedDocumentsByUser(
+            @PathVariable @Parameter(description = "Логін користувача") String userLogin) {
         return ResponseEntity.ok(documentService.getUnsignedDocumentsByUser(userLogin));
     }
 
     @GetMapping("/dates")
-    public ResponseEntity<List<Document>> getDocumentsBetweenDates(@RequestParam LocalDate startDate, @RequestParam LocalDate endDate) {
+    @Operation(summary = "Отримати документи між датами", description = "Отримує документи, створені між двома датами")
+    public ResponseEntity<List<Document>> getDocumentsBetweenDates(
+            @RequestParam @Parameter(description = "Початкова дата") LocalDate startDate,
+            @RequestParam @Parameter(description = "Кінцева дата") LocalDate endDate) {
         return ResponseEntity.ok(documentService.getDocumentsBetweenDates(startDate, endDate));
     }
 }

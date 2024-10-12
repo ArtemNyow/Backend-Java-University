@@ -29,6 +29,8 @@ public class Document {
     @Column(nullable = false)
     private String userLogin;
     // Constructors, getters, setters
+    public Document() {
+    }
 
     public Document(Long id, String title, DocumentType type, String body, LocalDate creationDate, LocalDate signedDate, String userLogin) {
         this.id = id;
@@ -38,10 +40,6 @@ public class Document {
         this.creationDate = creationDate;
         this.signedDate = signedDate;
         this.userLogin = userLogin;
-    }
-
-    public Document() {
-
     }
 
     public Long getId() {
